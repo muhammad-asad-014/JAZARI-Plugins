@@ -1,0 +1,39 @@
+{
+  "generated_at": "2026-05-16T09:57:07.620463",
+  "plugins": [
+    {
+      "id": "AERO",
+      "name": "Automated Enrollment and Record Organizer",
+      "version": "1.0.0",
+      "description": "Easy web-based attendance tracking with reports",
+      "author": "Asad",
+      "category": "attendance",
+      "icon": "fa-clock",
+      "target_role": [
+        "admin",
+        "employee",
+        "teacher",
+        "student"
+      ],
+      "target_environments": [
+        "corporate",
+        "education"
+      ],
+      "price": "free",
+      "tags": [
+        "attendance",
+        "tracking",
+        "reports"
+      ],
+      "permissions": [
+        "read_attendance",
+        "write_attendance"
+      ],
+      "hooks": [
+        "dashboard_widget",
+        "sidebar_menu"
+      ]
+    }
+  ],
+  "total": 1
+}
