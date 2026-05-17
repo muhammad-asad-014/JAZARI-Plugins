@@ -1,0 +1,11 @@
+{
+     "id": "aero",
+     "domain": "aero_0.1.1",
+     "name":"AERO",
+     "folder_name":"AERO_1.0.1",
+     "author": "Asad",
+     "version":"1.0.1",
+     "home":"Manage Attendance",
+    "summary": "Automated Enrollment and Record Organizer.",
+     "releases": []
+}

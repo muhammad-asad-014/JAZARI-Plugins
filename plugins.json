@@ -20,6 +20,46 @@
       "summary": "Intelligent Knowledge Analyzer for Revision & Insightful Summaries.",
       "icon": "📝",
       "tags": ["notes", "ai", "markdown"]
+    },
+    {
+      "id": "zenith",
+      "name": "ZENITH",
+      "version": "1.0.1",
+      "folder_name": "ZENITH_1.0.1",
+      "author": "Asad",
+      "summary": "Zone of Educational Navigation for Intelligent Testing and Hosting",
+      "icon": "📝",
+      "tags": ["quiz", "ai", "automated quiz"]
+    },
+    {
+      "id": "roberta",
+      "name": "ROBERTA",
+      "version": "1.0.1",
+      "folder_name": "ROBERTA_1.0.1",
+      "author": "Asad",
+      "summary": "Real time Observation of Behavior, Engagement and Reporting Teaching Analytics",
+      "icon": "📝",
+      "tags": ["attention", "behavior", "monitoring"]
+    },
+    {
+      "id": "jaz",
+      "name": "JAZ",
+      "version": "1.0.1",
+      "folder_name": "JAZ_1.0.1",
+      "author": "Asad",
+      "summary": "Just in time Assistance Zone.",
+      "icon": "📝",
+      "tags": ["ai", "assistant", "RAG"]
+    },
+    {
+      "id": "presenta",
+      "name": "PRESENTA",
+      "version": "1.0.1",
+      "folder_name": "PRESENTA_1.0.1",
+      "author": "Asad",
+      "summary": "Presentation Rendering Engine.",
+      "icon": "📝",
+      "tags": ["presentation", "slides", "ppt"]
     }
   ]
 }
