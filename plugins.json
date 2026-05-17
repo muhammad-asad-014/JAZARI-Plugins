@@ -6,7 +6,7 @@
       "name": "AERO",
       "version": "2.0.1",
       "folder_name": "AERO_2.0.1",
-      "author": "Asad",
+      "author": "Tetramen",
       "summary": "Automated Enrollment and Record Organizer with Computer Vision.",
       "icon": "📸",
       "tags": ["attendance", "ai", "computer-vision"]
@@ -16,7 +16,7 @@
       "name": "IKARIS",
       "version": "1.0.1",
       "folder_name": "IKARIS_1.0.1",
-      "author": "Asad",
+      "author": "Tetramen",
       "summary": "Intelligent Knowledge Analyzer for Revision & Insightful Summaries.",
       "icon": "📝",
       "tags": ["notes", "ai", "markdown"]
@@ -26,7 +26,7 @@
       "name": "ZENITH",
       "version": "1.0.1",
       "folder_name": "ZENITH_1.0.1",
-      "author": "Asad",
+      "author": "Tetramen",
       "summary": "Zone of Educational Navigation for Intelligent Testing and Hosting",
       "icon": "📝",
       "tags": ["quiz", "ai", "automated quiz"]
@@ -36,7 +36,7 @@
       "name": "ROBERTA",
       "version": "1.0.1",
       "folder_name": "ROBERTA_1.0.1",
-      "author": "Asad",
+      "author": "Tetramen",
       "summary": "Real time Observation of Behavior, Engagement and Reporting Teaching Analytics",
       "icon": "📝",
       "tags": ["attention", "behavior", "monitoring"]
@@ -46,7 +46,7 @@
       "name": "JAZ",
       "version": "1.0.1",
       "folder_name": "JAZ_1.0.1",
-      "author": "Asad",
+      "author": "Tetramen",
       "summary": "Just in time Assistance Zone.",
       "icon": "📝",
       "tags": ["ai", "assistant", "RAG"]
@@ -56,7 +56,7 @@
       "name": "PRESENTA",
       "version": "1.0.1",
       "folder_name": "PRESENTA_1.0.1",
-      "author": "Asad",
+      "author": "Tetramen",
       "summary": "Presentation Rendering Engine.",
       "icon": "📝",
       "tags": ["presentation", "slides", "ppt"]
