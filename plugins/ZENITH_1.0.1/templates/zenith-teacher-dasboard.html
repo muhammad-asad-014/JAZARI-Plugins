@@ -1,0 +1,270 @@
+{% extends 'teacher/teacher-base.html' %}
+{% block title %}Teacher Dashboard{% endblock %}
+
+<!-- add custom css -->
+{% block addCSS %}
+<style>
+    /* --- Main Container --- */
+    .attendance-container {
+        width: 100%;
+        max-width: 100%;
+        margin: 0 auto;
+        padding: 10px;
+    }
+
+
+
+    /* --- Responsive Grid System --- */
+    .quiz-dashboard-container {
+        display: flex;
+        flex-direction: column; /* Stack by default (Mobile) */
+        gap: 20px;
+    }
+
+    /* Desktop/Tablet split */
+    @media (min-width: 1024px) {
+        .quiz-dashboard-container {
+            flex-direction: row; /* Side-by-side on Desktop */
+            align-items: stretch;
+        }
+        
+        .summary-card { flex: 1; } /* Take remaining space */
+        .control-card { width: 320px; flex-shrink: 0; } /* Fixed sidebar width */
+    }
+
+    /* --- Info Grid (The 6 Boxes) --- */
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(1, 1fr); /* 1 col on small mobile */
+        gap: 12px;
+        margin-top: 15px;
+    }
+
+    @media (min-width: 480px) {
+        .info-grid { grid-template-columns: repeat(2, 1fr); } /* 2 cols on large phone */
+    }
+
+    @media (min-width: 768px) {
+        .info-grid { grid-template-columns: repeat(3, 1fr); } /* 3 cols on tablet/desktop */
+    }
+
+    /* --- Card & Content Styling --- */
+    .summary-card, .control-card, .results-section {
+        padding: 20px;
+        border-radius: var(--radius-lg);
+        /* height: 100%; */
+    }
+
+   .info-item {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--glass-border);
+        border-radius: 12px;
+        padding: 20px; /* Reduced from 43px which was causing overflow */
+        text-align: center;
+    }
+    /* QR & Control Specifics */
+    .qr-box {
+        background: white;
+        padding: 10px;
+        border-radius: 12px;
+        margin: 15px auto;
+        max-width: 180px; /* Prevents QR from getting huge */
+    }
+
+    .qr-box img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+
+    /* --- Table Responsiveness --- */
+    .table-scroll {
+        width: 100%;
+        overflow-x: auto; /* Horizontal scroll for mobile */
+        overflow-y: auto; /* Vertical scroll for long lists */
+        max-height: 500px; /* Limits table height so it doesn't hit the footer */
+        -webkit-overflow-scrolling: touch;
+        margin-top: 15px;
+    }
+.data-table {
+        width: 100%;
+        min-width: 700px; /* Slightly increased to ensure mobile scroll trigger */
+        border-collapse: collapse;
+    }
+
+    .results-section {
+        width: 100%;
+        margin-top: 20px;
+        margin-bottom: 30px; /* Adds space before the footer */
+    }
+
+    /* Utility */
+    .text-right { text-align: right; }
+    .url-hint {
+        word-break: break-all;
+        font-family: monospace;
+        font-size: 0.75rem;
+        background: rgba(0,0,0,0.15);
+        padding: 10px;
+        border-radius: 8px;
+    }
+</style>
+<meta name="csrf-token" content="{{ csrf_token() }}">
+{% endblock %}
+<!-- navlinks activation -->
+{% block overviewActive %}{% endblock %}
+
+
+
+<!-- add section title -->
+{% block sectionTitle %}Teacher Dashboard{% endblock %}
+
+<!-- add section code -->
+{% block section %}
+<div class="attendance-container">
+
+    <div class="quiz-dashboard-container">
+        
+        <div class="summary-card glass">
+            <div class="table-header" style="border-bottom: 1px solid var(--glass-border); padding-bottom: 10px;">
+                <h3 style="color: var(--accent-color); font-size: 1.1rem;">
+                    <i class="fas fa-info-circle"></i> Quiz Summary
+                </h3>
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <i class="fas fa-book"></i>
+                    <span class="info-val" style="display:block; font-weight:700;">{{ data.name }}</span>
+                    <span class="info-lbl" style="font-size:0.75rem; color:var(--text-muted);">Quiz Topic</span>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-fingerprint"></i>
+                    <span class="info-val" style="display:block; font-weight:700;">{{ data.id }}</span>
+                    <span class="info-lbl" style="font-size:0.75rem; color:var(--text-muted);">Quiz ID</span>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span class="info-val" style="display:block; font-weight:700;">{{ data.date_created.date() }}</span>
+                    <span class="info-lbl" style="font-size:0.75rem; color:var(--text-muted);">Created On</span>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-users"></i>
+                    <span class="info-val" style="display:block; font-weight:700;">{{ data.class_id.upper() }}</span>
+                    <span class="info-lbl" style="font-size:0.75rem; color:var(--text-muted);">Class ID</span>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-question-circle"></i>
+                    <span class="info-val" style="display:block; font-weight:700;">10</span>
+                    <span class="info-lbl" style="font-size:0.75rem; color:var(--text-muted);">Total MCQs</span>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-user-tie"></i>
+                    <span class="info-val" style="display:block; font-weight:700;">{{ data.teacher.upper() }}</span>
+                    <span class="info-lbl" style="font-size:0.75rem; color:var(--text-muted);">Teacher ID</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="control-card glass">
+            <h3 style="color: #ffb703; font-size: 1.1rem;text-align: center;"><i class="fas fa-exclamation-triangle"></i> Session Controls</h3>
+            
+            <div class="qr-box">
+                <div id="qrcode"></div>
+            </div>
+            <center> <a href="{{qr_code}}" >Copy LInk</a></center>
+           
+
+            <p style="font-size: 0.85rem; margin: 10px 0; color: var(--text-muted); text-align: center;">Scan to join the quiz.</p>
+
+
+            <button onclick="confirmEndSession()" class="btn-end-session" style="background: linear-gradient(135deg, #ffb703, #fb8500); color: white; width: 100%; padding: 12px; border-radius: 30px; font-weight: 700; border: none; margin-top: 15px; cursor: pointer;">
+                 End Live Session
+            </button>
+        </div>
+    </div>
+
+    <div class="results-section data-table-container glass">
+        <div class="table-header">
+            <h3><i class="fas fa-list-ol"></i> Student Results</h3>
+        </div>
+        
+        <div class="table-scroll">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th width="60">SR.</th>
+                        <th>STUDENT ID</th>
+                        <th>STUDENT NAME</th>
+                        <th class="text-right">MARKS (out of 10)</th>
+                    </tr>
+                </thead>
+                <tbody id="studentResultsBody">
+                    {% if result %}
+                    {%for res in result%}
+                    <tr>
+                        <td></td>
+                        <td>{{res.student_id}}</td>
+                        <td>{{res.student_name}}</td>
+                        <td>{{res.obtained_marks}}</td>
+                    </tr>
+                    {%endfor%}
+                    {%else%}
+                    <tr>
+                        <td colspan="4" class="text-center" style="padding: 40px; color: var(--text-muted);text-align: center;">
+                            No student results data available yet.
+                        </td>
+                    </tr>
+                    {%endif%}
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+
+<!-- add custom JS -->
+{% block addJS %}
+<script src="{{ url_for('zenith.static', filename='qrcode.min.js') }}"></script>
+<script type="text/javascript">
+new QRCode(document.getElementById("qrcode"), "{{ qr_code }}");
+</script>
+<script>
+  async function confirmEndSession() {
+    if (confirm("Are you sure you want to end the live session?")) {
+        
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        const payload = {
+            quiz_id: "{{ quiz_id }}" 
+        };
+        console.log(payload)
+        try {
+            const response = await fetch("{{ url_for('zenith.end_quiz') }}", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' ,
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                alert("Session ended and cleaned up successfully.");
+                
+                window.location.href = "{{ url_for('zenith.home') }}"; 
+            } else {
+                alert("Error ending session: " + result.message);
+            }
+        } catch (error) {
+            console.error("Network error:", error);
+            alert("Could not connect to server to end session.");
+        }
+    }
+}
+</script>
+
+{% endblock %}

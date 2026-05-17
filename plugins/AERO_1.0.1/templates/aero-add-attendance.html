@@ -1,0 +1,296 @@
+{% extends 'teacher/teacher-base.html' %}
+{% block title %}New Attendance{% endblock %}
+
+<!-- add custom css -->
+{% block addCSS %}
+<style>
+    /* --- Header Layout --- */
+.content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.page-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+}
+
+/* --- Primary "Add" Button --- */
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent-color);
+    color: white;
+    padding: 12px 24px;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-primary:hover {
+    background: var(--accent-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2);
+}
+
+.plus-icon {
+    font-size: 1.2rem;
+    line-height: 1;
+}
+
+/* --- Table Refinements --- */
+.table-header {
+    margin-bottom: 20px;
+}
+
+.subtitle {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.font-medium { font-weight: 500; }
+.text-right { text-align: right; }
+
+/* --- Action Buttons --- */
+.action-group {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-start;
+}
+
+.action-btn {
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 8px;
+    transition: 0.2s;
+}
+
+/* Update Button */
+.action-btn.edit {
+    background: rgba(99, 102, 241, 0.1);
+    color: var(--accent-color);
+}
+
+.action-btn.edit:hover {
+    background: var(--accent-color);
+    color: white;
+}
+
+/* Delete Button */
+.action-btn.delete {
+    background: rgba(244, 63, 94, 0.1); /* Soft Red */
+    color: #f43f5e;
+}
+
+.action-btn.delete:hover {
+    background: #f43f5e;
+    color: white;
+}
+
+/* --- Attendance Layout --- */
+.attendance-container {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.selection-card {
+    padding: 20px;
+    display: flex;
+    align-items: flex-end;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+    min-width: 200px;
+}
+
+.form-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.glass-select {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    padding: 12px;
+    color: var(--text-main);
+    outline: none;
+    cursor: pointer;
+}
+
+/* --- Present/Absent Toggle --- */
+.status-switch {
+    display: flex;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 4px;
+    border-radius: 10px;
+    border: 1px solid var(--glass-border);
+    width: fit-content;
+}
+
+.status-switch input { display: none; }
+
+.status-switch label {
+    padding: 6px 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: 0.3s;
+    color: var(--text-muted);
+}
+
+.status-switch input[value="present"]:checked + label {
+    background: #10b981; /* Green */
+    color: white;
+}
+
+.status-switch input[value="absent"]:checked + label {
+    background: #f43f5e; /* Red */
+    color: white;
+}
+
+.submit-area {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+    padding: 20px 0;
+}
+</style>
+
+{% endblock %}
+
+<!-- navlinks activation -->
+{% block overviewActive %}{% endblock %}
+
+
+
+<!-- add section title -->
+{% block sectionTitle %}New Attendance Record{% endblock %}
+
+<!-- add section code -->
+{% block section %}
+
+<div class="attendance-container">
+    
+    <div class="selection-card glass">
+        <form action="{{ url_for('aero.addAttendance') }}" method="GET" style="display: flex; width: 100%; gap: 20px; align-items: flex-end;">
+            <div class="form-group">
+                <label>Select Class / Subject</label>
+                <select name="class_id" class="glass-select" required>
+                    <option value="" disabled selected>Choose a class...</option>
+                    <option value="{{ classes.classID }}" {{ 'selected' if request.args.get('class_id') == classes.ClassID|string }}>
+                        {{ classes.className }}
+                    </option>
+                </select>
+            </div>
+            
+            <div class="form-group" style="flex: 0;">
+                <label>Date</label>
+                <input type="date" class="glass-select" value="{{ current_date }}" disabled>
+            </div>
+
+            <button type="submit" class="btn-primary glass" style="height: 48px;">
+                Load Student List
+            </button>
+        </form>
+    </div>
+
+    {% if students %}
+    <form action="{{ url_for('aero.saveAttendance') }}" method="POST">
+        <input type="hidden" name="class_id" value="{{ classes.classID}}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <section class="data-table-container glass">
+            <div class="table-header">
+                <h3>Mark Attendance</h3>
+                <p class="subtitle">Total Students: {{ students|length }}</p>
+            </div>
+            
+            <div class="table-scroll">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Roll No.</th>
+                            <th>Student Name</th>
+                            <th class="text-right"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students %}
+                        <tr>
+                            <td class="font-medium">{{ student.id.upper() }}</td>
+                            <td>{{ student.fname }} {{ student.lname }}</td>
+                            <td class="text-right">
+                                <div class="status-switch" style="margin-left: auto;">
+                                    <input type="radio" name="status_{{ student.id }}" value="present" id="p_{{ student.id }}" checked>
+                                    <label for="p_{{ student.id }}">Present</label>
+                                    
+                                    <input type="radio" name="status_{{ student.id }}" value="absent" id="a_{{ student.id }}">
+                                    <label for="a_{{ student.id }}">Absent</label>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="submit-area">
+                <button type="submit" class="btn-primary" style="padding: 15px 40px; font-size: 1rem;">
+                    Submit Record
+                </button>
+            </div>
+        </section>
+    </form>
+    {% elif request.args.get('class_id') %}
+    <div class="glass" style="padding: 40px; text-align: center; color: var(--text-muted);">
+        No students found for this class.
+    </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}
+
+
+<!-- add custom JS -->
+{% block addJS %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Smooth Scroll to Student List after reload
+    const markingArea = document.getElementById('markingArea');
+    if (markingArea && window.location.search.includes('class_id')) {
+        markingArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // 2. Prevent double-submission
+    const attendanceForm = document.getElementById('attendanceForm');
+    if (attendanceForm) {
+        attendanceForm.addEventListener('submit', () => {
+            const btn = attendanceForm.querySelector('button[type="submit"]');
+            btn.innerHTML = "Saving...";
+            btn.disabled = true;
+            btn.style.opacity = "0.7";
+        });
+    }
+});
+</script>
+
+{% endblock %}

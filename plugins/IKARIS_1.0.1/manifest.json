@@ -1,0 +1,11 @@
+{
+     "id": "ikaris",
+     "domain": "ikaris_1.0.1",
+     "name":"IKARIS",
+     "folder_name":"IKARIS_1.0.1",
+     "author": "Asad",
+     "version":"1.0.1",
+     "home":"Generate Notes",
+    "summary": "Intelligent Knowledge Analyzer for Revision & Insightful Summaries.",
+     "releases": []
+}

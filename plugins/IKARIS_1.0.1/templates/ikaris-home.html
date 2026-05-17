@@ -1,0 +1,383 @@
+{% extends 'teacher/teacher-base.html' %}
+{% block title %}Generate Notes{% endblock %}
+
+<!-- add custom css -->
+{% block addCSS %}
+<style>
+    /* --- Header Layout --- */
+.content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.page-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+}
+
+/* --- Primary "Add" Button --- */
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent-color);
+    color: white;
+    padding: 12px 24px;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-primary:hover {
+    background: var(--accent-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2);
+}
+
+.plus-icon {
+    font-size: 1.2rem;
+    line-height: 1;
+}
+
+/* --- Table Refinements --- */
+.table-header {
+    margin-bottom: 20px;
+}
+
+.subtitle {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.font-medium { font-weight: 500; }
+.text-right { text-align: right; }
+
+/* --- Action Buttons --- */
+.action-group {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-start;
+}
+
+.action-btn {
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 8px;
+    transition: 0.2s;
+}
+
+/* Update Button */
+.action-btn.edit {
+    background: rgba(99, 102, 241, 0.1);
+    color: var(--accent-color);
+}
+
+.action-btn.edit:hover {
+    background: var(--accent-color);
+    color: white;
+}
+
+/* Delete Button */
+.action-btn.delete {
+    background: rgba(244, 63, 94, 0.1); /* Soft Red */
+    color: #f43f5e;
+}
+
+.action-btn.delete:hover {
+    background: #f43f5e;
+    color: white;
+}
+
+/* --- Modal Overlay --- */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(216, 216, 216, 0.7);
+    backdrop-filter: blur(10px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    width: 450px;
+    padding: 30px;
+}
+
+/* --- Form Styles --- */
+.input-field {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    color: rgb(109, 109, 109);
+    outline: none;
+}
+
+/* --- Progress Bar --- */
+.progress-container {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    height: 8px;
+    margin-top: 5px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--accent-color);
+    width: 0%; /* Dynamic */
+    transition: width 0.4s ease;
+}
+
+.status-badge {
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: rgba(99, 102, 241, 0.2);
+    color: var(--accent-color);
+}
+</style>
+
+{% endblock %}
+
+<!-- navlinks activation -->
+{% block overviewActive %}{% endblock %}
+
+
+
+<!-- add section title -->
+{% block sectionTitle %}Generate Notes{% endblock %}
+
+<!-- add section code -->
+{% block section %}
+    <div class="content-header">
+        <h2 class="page-title"></h2>
+        <button id="newQuizBtn" class="btn-primary glass" style="cursor: pointer;">
+            <span class="plus-icon">+</span> Generate Notes
+        </button>
+    </div>
+
+    <section class="data-table-container glass">
+        <div class="table-header">
+            <h3>Processing Queue</h3>
+            <p class="subtitle">Generation requests are listed here.</p>
+        </div>
+        
+        <div class="table-scroll">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Report ID</th>
+                        <th>Report Name</th> 
+                        <th>Status / Progress</th>
+                        <th class="text-right">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="activeQuizBody">
+    {% for rec in active_data %}
+    <tr id="row-{{rec.id}}">
+        <td class="font-medium">{{rec.id}}</td>
+        <td class="text-muted">{{rec.name}}</td>
+        <td>
+            {% if rec.status == 'processing' %}
+                <div class="status-msg-{{rec.id}} subtitle" style="margin-bottom:5px;">Generation in progress...</div>
+                <div class="progress-container">
+                    <div id="bar-{{rec.id}}" class="progress-fill" style="width: 10%;"></div>
+                </div>
+            {% else %}
+                <span class="status-badge">Live</span>
+            {% endif %}
+        </td>
+        <td class="text-right">
+            <div class="action-group">
+                {% if rec.status == 'processing' %}
+                    <span class="subtitle">Wait for AI...</span>
+                {% else %}
+                    <a href="{{url_for('ikaris.teacher_dashboard', quiz_id=rec.id)}}" class="action-btn edit">Cancel Generation</a>
+                    <!-- <a href="{{url_for('ikaris.attempt_quiz', quiz_id=rec.id)}}" class="action-btn delete">End</a> -->
+                {% endif %}
+            </div>
+        </td>
+    </tr>
+    {% endfor %}
+</tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="data-table-container glass" style="margin-top: 30px;">
+        <div class="table-header">
+            <h3>Generated Notes</h3>
+        </div>
+        <div class="table-scroll">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Report Name</th> 
+                        <th>Generated On</th>
+                        <th class="text-right">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for rec in data %}
+                    <tr>
+                        <td class="font-medium">{{rec.id}}</td>
+                        <td class="text-muted">{{rec.name}}</td> <td class="text-muted">{{rec.date_created}}</td>
+                        <td class="text-right"><a href="{{url_for('ikaris.download_report', report_id=rec.id)}}" class="action-btn edit">Download PDF</a>
+                        <a href="{{url_for('ikaris.delete_report', report_id=rec.id)}}" class="action-btn delete">Delete Report</a></td>
+
+                    </tr>
+
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+   <div id="quizModal" class="modal-overlay">
+    <div class="modal-content glass">
+        <h3>Configure Notes Details</h3>
+        <p class="subtitle">Provide details to process.</p>
+        
+        <form id="quizForm" enctype="multipart/form-data">
+            <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 15px;">
+                
+                <div class="form-group">
+                    <label class="subtitle">Report Name (Lecture Topic)</label>
+                    <input type="text" id="reportName" class="input-field" placeholder="e.g., Intro to Neural Networks" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="subtitle">Lecture PDF</label>
+                    <input type="file" id="reportPDF" class="input-field" accept=".pdf" >
+                </div>
+
+                
+                <div style="display: flex; gap: 10px;">
+                    
+                    <div class="form-group" style="flex:1;">
+                        <label class="subtitle">Select Mode</label>
+                        <select id="mode" class="input-field">
+                            <option value="briefDocs">Briefing Docs</option>
+                            <option value="studyGuide" selected>Study Guide</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="camera-controls" style="margin-top: 20px;">
+                    <button type="button" id="generateBtn" class="btn-primary" style="width: 100%; cursor: pointer;">Generate Notes</button>
+                    <button type="button" id="closeModal" class="action-btn delete" style="width: 100%; margin-top: 10px; padding: 15px 0px;">Cancel</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+<!-- add custom JS -->
+{% block addJS %}
+<script src="{{ url_for('ikaris.static', filename='socket.io.js') }}"></script>
+<script>
+const socket = io(); 
+
+document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('quizModal');
+    const activeBody = document.getElementById('activeQuizBody');
+
+    const addGenerationRow = (displayTitle) => {
+        const rowId = "generating-row";
+        const existing = document.getElementById(rowId);
+        if (existing) existing.remove();
+
+        const html = `
+            <tr id="${rowId}">
+                <td class="font-medium">---</td>
+                <td class="text-muted">${displayTitle}</td> <td>
+                    <div class="status-msg subtitle" style="margin-bottom:5px;">Initializing...</div>
+                    <div class="progress-container" style="width:100%; background:rgba(255,255,255,0.1); height:8px; border-radius:4px; overflow:hidden;">
+                        <div class="progress-fill" style="width:0%; height:100%; background:var(--accent-color); transition:0.3s;"></div>
+                    </div>
+                </td>
+                <td class="text-right">---</td>
+            </tr>
+        `;
+        activeBody.insertAdjacentHTML('afterbegin', html);
+    };
+
+    document.getElementById('generateBtn').addEventListener('click', async () => {
+        const reportName = document.getElementById('reportName').value;
+        const pdfFile = document.getElementById('reportPDF').files[0];
+        const mode = document.getElementById('mode').value;
+
+        // quiz name validation
+        if (!reportName.trim()) {
+            alert("Please provide a Report Name.");
+            return;
+        }
+        if (!pdfFile && !topics.trim()) {
+            alert("Please upload a PDF.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('report_name', reportName);
+        if (pdfFile) formData.append('pdf', pdfFile);
+        formData.append("name", reportName);
+        formData.append('mode', mode);
+
+        modal.style.display = 'none';
+        
+        addGenerationRow(reportName);
+
+        try {
+            const response = await fetch("{{ url_for('ikaris.start_generation') }}", {
+                method: "POST",
+                body: formData,
+                headers: { "X-CSRFToken": "{{ csrf_token() }}" }
+            });
+            const result = await response.json();
+            console.log("Generation Task Started:", result.report_id);
+            if (result.success) {
+                window.location.reload(); 
+            } else {
+                alert("Error: " + result.message);
+            }
+        } catch (err) {
+            console.error("Fetch error:", err);
+            alert("Connection Error.");
+        }
+    });
+
+    socket.on('quiz_progress', (data) => {
+    const bar = document.getElementById(`bar-${data.quiz_id}`);
+    const statusText = document.querySelector(`.status-msg-${data.report_id}`);
+    
+    if (bar) {
+        bar.style.width = data.percentage + '%';
+        if (statusText) statusText.innerText = data.message;
+    }
+    
+    if (data.status === 'completed') {
+        // Only reload if we are on the Manage Quiz page
+        setTimeout(() => location.reload(), 1000);
+    }
+});
+
+    document.getElementById('newQuizBtn').onclick = () => modal.style.display = 'flex';
+    document.getElementById('closeModal').onclick = () => modal.style.display = 'none';
+});
+</script>
+{% endblock %}

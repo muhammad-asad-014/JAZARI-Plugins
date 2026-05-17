@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz not Found - JAZARI</title>
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+    
+    <style>
+        /* --- Strict Height Lock --- */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Prevents blobs from expanding the page */
+        }
+
+        .error-page {
+            height: 100dvh; /* Dynamic Viewport Height for mobile */
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-color);
+            font-family: 'Inter', sans-serif;
+            position: relative;
+        }
+
+        /* --- Blob Container Fix --- */
+        #blob-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            overflow: hidden; /* Clips moving blobs */
+            pointer-events: none;
+        }
+
+        /* --- Content Wrapper --- */
+        .error-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 10;
+        }
+
+        /* --- The Glass Card --- */
+        .error-card {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            padding: 40px 30px;
+            text-align: center;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--glass-border);
+            box-shadow: none !important;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            animation: fadeInScale 0.5s ease-out;
+        }
+
+        .code-badge {
+            font-size: 4.5rem;
+            font-weight: 800;
+            color: var(--accent-color);
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+
+        .error-text h1 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin: 0 0 10px 0;
+        }
+
+        .error-text p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+            margin-bottom: 30px;
+        }
+
+        /* --- Actions --- */
+        .error-nav {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .btn-primary, .btn-ghost {
+            padding: 10px 22px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+
+        /* --- Footer --- */
+        .copyright {
+            padding: 20px 0;
+            text-align: center;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            z-index: 10;
+        }
+
+        /* --- Mobile Responsive Fix --- */
+        @media (max-width: 480px) {
+            .error-card {
+                padding: 30px 20px;
+                max-width: 320px;
+            }
+
+            .code-badge {
+                font-size: 3.5rem;
+            }
+
+            .error-nav {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .btn-primary, .btn-ghost {
+                width: 100%;
+                box-sizing: border-box;
+            }
+        }
+
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.97); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="error-page">
+    <div class="blob-container" id="blob-container"></div>
+
+    <main class="error-container">
+        <div class="error-card glass">
+            <div class="code-badge">404</div>
+            
+            <div class="error-text">
+                <h1>{{quiz_id}} Not Found</h1>
+                <p>The following quiz has been ended, Please contact your teacher.</p>
+            </div>
+
+            <!-- <div class="error-nav">
+                <button onclick="history.back()" class="btn-ghost" style="cursor: pointer;">Go Back</button>
+                <a href="/" class="btn-primary">Dashboard</a>
+            </div> -->
+        </div>
+    </main>
+
+    <footer class="copyright">
+        © 2025 JAZARI. ALL RIGHTS RESERVED.
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/login.js') }}"></script>
+</body>
+</html>

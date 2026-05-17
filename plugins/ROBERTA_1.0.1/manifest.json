@@ -1,0 +1,11 @@
+{
+     "id": "roberta",
+     "domain": "roberta_1.0.1",
+     "name":"ROBERTA",
+     "folder_name":"ROBERTA_1.0.1",
+     "author": "Asad",
+     "version":"1.0.1",
+     "home":"Present Lecture",
+    "summary": "Realtime Observation of Behavior, Engagement & Reporting teaching Analytics.",
+     "releases": []
+}

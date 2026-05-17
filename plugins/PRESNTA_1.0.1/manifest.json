@@ -1,0 +1,11 @@
+{
+     "id": "presenta",
+     "domain": "presenta_1.0.1",
+     "name":"PRESENTA",
+     "folder_name":"PRESENTA_1.0.1",
+     "author": "Asad",
+     "version":"1.0.1",
+     "home":"Generate Presentation",
+    "summary": "Presenta is an AI-powered tool that transforms raw content like PDFs, notes, or topics into visually structured, modern HTML presentation slides.",
+     "releases": []
+}

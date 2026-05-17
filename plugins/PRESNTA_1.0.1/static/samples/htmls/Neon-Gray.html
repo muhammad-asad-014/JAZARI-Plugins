@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OWASP ZAP 2.9 Presentation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-body: #1a1c22;
+            --bg-slide: #2d3139;
+            --accent: #6366f1;
+            --accent-glow: rgba(99, 102, 241, 0.4);
+            --text-heading: #ffffff;
+            --text-body: #d1d5db;
+            --font-main: 'Plus Jakarta Sans', sans-serif;
+            --font-code: 'JetBrains Mono', monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-body);
+            font-family: var(--font-main);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            /* Sublte mesh gradient background */
+            background-image: radial-gradient(at 0% 0%, hsla(231,15%,18%,1) 0, transparent 50%), 
+                              radial-gradient(at 100% 100%, hsla(230,58%,20%,1) 0, transparent 50%);
+        }
+
+        .deck {
+            width: 90vw;
+            max-width: 1000px;
+            height: 600px;
+            position: relative;
+        }
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            background: var(--bg-slide);
+            border-radius: 20px;
+            padding: 60px;
+            display: none;
+            flex-direction: column;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .slide.active {
+            display: flex;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Typography */
+        .slide-tag {
+            font-family: var(--font-code);
+            color: var(--accent);
+            font-size: 0.8rem;
+            letter-spacing: 3px;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            color: var(--text-heading);
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+        }
+
+        .centered {
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 24px;
+            border-radius: 12px;
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            border-color: var(--accent);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .card h3 { color: var(--accent); margin-bottom: 10px; font-size: 1rem; }
+        .card p { color: var(--text-body); font-size: 0.95rem; line-height: 1.6; }
+
+        /* Navigation */
+        .nav-controls {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0,0,0,0.3);
+            padding: 8px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn {
+            background: var(--bg-slide);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+        }
+
+        .btn:hover:not(:disabled) {
+            background: var(--accent);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .btn:disabled { opacity: 0.2; cursor: not-allowed; }
+
+        .counter {
+            color: var(--text-body);
+            font-family: var(--font-code);
+            font-size: 0.8rem;
+            padding: 0 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="deck">
+        <div class="slide active centered">
+            <div class="slide-tag">OWASP Foundation</div>
+            <h1>Zed Attack Proxy<br><span style="color: var(--accent)">Version 2.9</span></h1>
+            <p style="color: var(--text-body)">Security Testing for Modern Web Applications</p>
+            <div style="margin-top: 40px; width: 60px; height: 2px; background: var(--accent);"></div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-tag">01 / Introduction</div>
+            <h1>Core Concepts</h1>
+            <div class="content-grid">
+                <div class="card">
+                    <h3>What is ZAP?</h3>
+                    <p>An open-source DAST tool used to discover vulnerabilities in web applications while they are running.</p>
+                </div>
+                <div class="card">
+                    <h3>The Intercept</h3>
+                    <p>ZAP acts as a Man-in-the-Middle proxy, allowing you to see and modify every request your browser makes.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-tag">02 / Methodology</div>
+            <h1>The Security Lifecycle</h1>
+            <div class="content-grid">
+                <div class="card">
+                    <h3>Assess</h3>
+                    <p>Discovery of vulnerabilities without attempting to actually exploit them.</p>
+                </div>
+                <div class="card">
+                    <h3>Test</h3>
+                    <p>The discovery and attempted exploitation of weaknesses to prove risk.</p>
+                </div>
+            </div>
+            <p style="margin-top: 30px; color: var(--text-body); font-style: italic;">"ZAP enables both automated scanning and manual 'tampering' for deeper results."</p>
+        </div>
+
+        <div class="slide">
+            <div class="slide-tag">03 / Automation</div>
+            <h1>Discovery & Spiders</h1>
+            <div class="content-grid">
+                <div class="card">
+                    <h3>Traditional Spider</h3>
+                    <p>Fast discovery by parsing HTML links. Best for high-performance crawling of static content.</p>
+                </div>
+                <div class="card">
+                    <h3>AJAX Spider</h3>
+                    <p>Launches a real browser to interact with JS elements. Critical for React, Vue, and Angular apps.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-tag">04 / Workspace</div>
+            <h1>Desktop Architecture</h1>
+            <div class="content-grid">
+                <div class="card">
+                    <h3>Sites Tree</h3>
+                    <p>Hierarchical view of every URL ZAP has discovered. Organize targets into specific "Contexts".</p>
+                </div>
+                <div class="card">
+                    <h3>Alert Window</h3>
+                    <p>Real-time list of findings categorized by risk: High, Medium, Low, and Informational.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-tag">05 / Advanced</div>
+            <h1>Beyond the Desktop</h1>
+            <div class="content-grid">
+                <div class="card">
+                    <h3>ZAP API</h3>
+                    <p>Control ZAP programmatically. Every UI feature is available via a JSON REST API for CI/CD pipelines.</p>
+                </div>
+                <div class="card">
+                    <h3>Add-on Marketplace</h3>
+                    <p>Extend Zative capabilities with community plugins for GraphQL, WebSockets, and OpenAPI.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide centered">
+            <div class="slide-tag">Conclusion</div>
+            <h1>Secure Your Code.</h1>
+            <p class="lead" style="color: var(--text-body); max-width: 600px; margin-bottom: 2rem;">ZAP is a versatile tool that grows with you, from basic automated scans to complex manual penetration tests.</p>
+            <div class="card" style="width: 100%; max-width: 400px;">
+                <p><b>Resources:</b> zaproxy.org</p>
+                <p><b>Community:</b> ZAP User Group</p>
+            </div>
+            <h2 style="color: var(--accent); margin-top: 40px; font-weight: 300;">Thank You</h2>
+        </div>
+    </div>
+
+    <div class="nav-controls">
+        <button class="btn" id="prev" disabled>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div class="counter" id="count">1 / 7</div>
+        <button class="btn" id="next">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+    </div>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        const next = document.getElementById('next');
+        const prev = document.getElementById('prev');
+        const count = document.getElementById('count');
+        let current = 0;
+
+        function update() {
+            slides.forEach((s, i) => s.classList.toggle('active', i === current));
+            count.innerText = `${current + 1} / ${slides.length}`;
+            prev.disabled = current === 0;
+            next.disabled = current === slides.length - 1;
+        }
+
+        next.onclick = () => { if(current < slides.length - 1) { current++; update(); } };
+        prev.onclick = () => { if(current > 0) { current--; update(); } };
+
+        document.onkeydown = (e) => {
+            if(e.key === "ArrowRight") next.click();
+            if(e.key === "ArrowLeft") prev.click();
+        };
+
+        update();
+    </script>
+</body>
+</html>

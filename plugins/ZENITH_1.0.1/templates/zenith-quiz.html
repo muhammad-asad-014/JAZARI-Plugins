@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM | Dynamic Assessment</title>
+
+    <style>
+        :root {
+            --primary: #11b5e4;
+            --dark: #034748;
+            --bg: #f0f8ff;
+            --error: #dc3545;
+            --success: #28a745;
+            --glass: rgba(255, 255, 255, 0.95);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--dark);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: var(--glass);
+            width: 100%;
+            max-width: 700px;
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #timer-box {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--success);
+            color: white;
+            padding: 12px 25px;
+            border-bottom-left-radius: 20px;
+            font-weight: 700;
+            display: none;
+            z-index: 10;
+        }
+
+        #timer-box.warning {
+            background: var(--error);
+            animation: shake 0.5s infinite;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: var(--dark);
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--primary);
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(45deg, var(--primary), #0caadc);
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 1rem;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            line-height: 1.5;
+            color: var(--dark);
+        }
+
+        .option {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            margin-bottom: 12px;
+            background: #fff;
+            border: 2px solid #f0f0f0;
+            border-radius: 12px;
+            text-align: left;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .option:hover:not(.disabled) {
+            border-color: var(--primary);
+            background: #f9feff;
+        }
+
+        .option.selected {
+            border-color: var(--primary);
+            background: #e1f5fe;
+            font-weight: 600;
+        }
+
+        /* Result States */
+        .option.correct {
+            border-color: var(--success);
+            background: #e8f5e9;
+            color: var(--success);
+        }
+
+        .option.wrong {
+            border-color: var(--error);
+            background: #ffebee;
+            color: var(--error);
+        }
+
+        .option.disabled {
+            cursor: default;
+        }
+
+        #rationale-box {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            background: #f8f9fa;
+            border-left: 5px solid var(--primary);
+            display: none;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .warning-card {
+            border: 2px solid var(--error);
+            background: #fffafa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="timer-box">
+        <i class="fas fa-stopwatch"></i> <span id="time-left">50</span>s
+    </div>
+
+    <div class="container">
+
+        <div id="view-details" class="view active">
+            <h2><i class="fas fa-user-edit"></i> Student Details</h2>
+            <div class="form-group">
+                <label>Student Full Name</label>
+                <input type="text" id="std-name" placeholder="Enter your name">
+            </div>
+            <div class="form-group">
+                <label>Roll Number / Student ID</label>
+                <input type="text" id="std-id" placeholder="Enter your ID">
+            </div>
+            <button class="btn" onclick="showInstructions()">Proceed to Instructions</button>
+        </div>
+
+        <div id="view-instructions" class="view">
+            <h2 style="color: var(--error);"><i class="fas fa-shield-alt"></i> Exam Rules</h2>
+            <div class="warning-card">
+                 <h2><i class="fas fa-chalkboard-user"></i> For Teachers</h2>
+            <ul>
+                <li><i class="fas fa-circle-dot"></i> Access the <b>Teacher Portal</b> to manage quiz, create quiz, and view detailed quiz reports.</li>
+                <li><i class="fas fa-circle-dot"></i> Quizzes are created using a JSON structure, allowing for complex question types and scoring.</li>
+                <li><i class="fas fa-circle-dot"></i> Generated reports provide deep insight into student performance, timing, and academic integrity flags.</li>
+            </ul>
+
+            <h2><i class="fas fa-user-graduate"></i> For Students (Assessment Rules)</h2>
+            <ul>
+                <li><i class="fas fa-circle-dot"></i> You will be timed <b>per question</b>, not for the whole quiz. Pay close attention to the countdown timer.</li>
+                <li><i class="fas fa-circle-dot"></i> Once an option is selected, your answer is <b>final</b> and cannot be changed.</li>
+                <li><i class="fas fa-circle-dot"></i> If the timer expires, the question is automatically marked as unanswered/incorrect, and you proceed to the next one.</li>
+            </ul>
+
+            <h3><i class="fas fa-shield-halved"></i> ACADEMIC INTEGRITY WARNING</h3>
+            <p>
+                The quiz environment is secured. <b>Do not switch tabs, minimize the window, or attempt to navigate away</b> while an assessment is active.
+            </p>
+            <p>
+                <b>INSTANT PENALTY:</b> Any unauthorized navigation will result in the <b>immediate expiration</b> of the current question's timer.
+            </p>
+
+            <h2><i class="fas fa-cogs"></i> Technical Requirements</h2>
+            <ul>
+                <li><i class="fas fa-circle-dot"></i> Use a modern, updated browser (Chrome, Firefox, Edge) for the best experience.</li>
+                <li><i class="fas fa-circle-dot"></i> A highly <b>stable internet connection</b> is mandatory.</li>
+            </ul>
+            </div>
+            <button class="btn" onclick="startAssessment()">Accept & Start Quiz</button>
+        </div>
+
+
+
+        <div id="view-quiz" class="view">
+            <div id="progress" style="font-size: 0.9rem; font-weight: 600; color: var(--primary); margin-bottom: 15px;">
+            </div>
+            <div id="question-area">
+                <p class="question-text" id="q-text"></p>
+                <div id="options-area"></div>
+                <div id="rationale-box"></div>
+            </div>
+            <button class="btn" id="next-btn" onclick="handleSubmit()" style="margin-top:20px; display:none;">Submit
+                Answer</button>
+        </div>
+
+        <div id="view-results" class="view" style="text-align: center;">
+            <div id="result-ui">
+                <i class="fas fa-poll-h" style="font-size: 4rem; color: var(--primary);"></i>
+                <h2 style="margin: 20px 0;">Quiz Result</h2>
+                <p id="final-status" style="font-weight: 500;"></p>
+                <div id="score-val" style="font-size: 3.5rem; font-weight: 800; color: var(--dark); margin: 15px 0;">
+                </div>
+                <button class="btn" onclick="location.reload()">Finish</button>
+            </div>
+        </div>
+    </div>
+
+ <script>const quizData = {{ quiz_json | tojson | safe }};
+
+    let state = {
+        currentQ: 0,
+        score: 0,
+        timer: 50,
+        interval: null,
+        student: {},
+        isTerminated: false,
+        tempChoice: null,
+        isLocked: false 
+    };
+
+    function switchView(id) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+
+    function showInstructions() {
+        const nameInput = document.getElementById('std-name');
+        const idInput = document.getElementById('std-id');
+        if (!nameInput.value || !idInput.value) return alert("Please enter your details.");
+        state.student.name = nameInput.value;
+        state.student.id = idInput.value;
+        switchView('view-instructions');
+    }
+
+    function startAssessment() {
+        switchView('view-quiz');
+        document.getElementById('timer-box').style.display = 'block';
+        loadQuestion();
+        enableCheatProtection();
+    }
+
+    function loadQuestion() {
+        state.isLocked = false;
+        state.tempChoice = null;
+        const nextBtn = document.getElementById('next-btn');
+        nextBtn.style.display = 'none';
+        nextBtn.innerText = "Submit Answer";
+        nextBtn.onclick = handleSubmit;
+        document.getElementById('rationale-box').style.display = 'none';
+
+        const q = quizData[state.currentQ];
+        document.getElementById('progress').innerText = `Question ${state.currentQ + 1} of ${quizData.length}`;
+        document.getElementById('q-text').innerText = q.question;
+
+        const area = document.getElementById('options-area');
+        area.innerHTML = '';
+        q.options.forEach((opt, idx) => {
+            const b = document.createElement('button');
+            b.className = 'option';
+            b.innerText = opt.text;
+            b.onclick = () => {
+                if (state.isLocked) return;
+                document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+                b.classList.add('selected');
+                state.tempChoice = idx;
+                nextBtn.style.display = 'block';
+            };
+            area.appendChild(b);
+        });
+
+        resetQuestionTimer();
+    }
+
+    function handleSubmit() {
+        if (state.tempChoice === null) return;
+        state.isLocked = true;
+        clearInterval(state.interval); 
+
+        const q = quizData[state.currentQ];
+        const selectedOpt = q.options[state.tempChoice];
+        const allButtons = document.querySelectorAll('.option');
+
+        allButtons.forEach((btn, idx) => {
+            btn.classList.add('disabled');
+            if (q.options[idx].correct) {
+                btn.classList.add('correct');
+            } else if (idx === state.tempChoice) {
+                btn.classList.add('wrong');
+            }
+        });
+
+        if (selectedOpt.correct) state.score++;
+
+        const ratBox = document.getElementById('rationale-box');
+        ratBox.innerHTML = `<strong>Rationale:</strong> ${selectedOpt.rationale}`;
+        ratBox.style.display = 'block';
+
+        const nextBtn = document.getElementById('next-btn');
+        nextBtn.innerText = "Next Question";
+        nextBtn.onclick = handleNext;
+    }
+
+    function handleNext() {
+        state.currentQ++;
+        if (state.currentQ < quizData.length) {
+            loadQuestion();
+        } else {
+            finishQuiz(false);
+        }
+    }
+
+    function resetQuestionTimer() {
+        clearInterval(state.interval);
+        state.timer = 50;
+        updateTimerUI();
+        state.interval = setInterval(() => {
+            state.timer--;
+            updateTimerUI();
+            if (state.timer <= 0) {
+                clearInterval(state.interval);
+                handleNext();
+            }
+        }, 1000);
+    }
+
+    function updateTimerUI() {
+        const el = document.getElementById('time-left');
+        const box = document.getElementById('timer-box');
+        el.innerText = state.timer;
+        if (state.timer <= 10) box.classList.add('warning');
+        else box.classList.remove('warning');
+    }
+
+    function enableCheatProtection() {
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden && !state.isTerminated) terminateQuiz("Tab Switching Detected");
+        });
+        window.onblur = () => {
+            if (!state.isTerminated) terminateQuiz("Window Focus Lost");
+        };
+        window.onbeforeunload = (e) => {
+            if (!state.isTerminated) {
+                e.preventDefault();
+                return "Warning: Reloading will result in a Zero score.";
+            }
+        };
+    }
+
+    function terminateQuiz(reason) {
+        state.isTerminated = true;
+        state.score = 0;
+        clearInterval(state.interval);
+        alert(`SECURITY VIOLATION: ${reason}\nScore reset to 0.`);
+        finishQuiz(true);
+    }
+
+    async function finishQuiz(wasTerminated) {
+        window.onbeforeunload = null;
+        state.isTerminated = true;
+        clearInterval(state.interval);
+        document.getElementById('timer-box').style.display = 'none';
+
+        // FIXED: Corrected the finalData object structure
+        const finalData = {
+            student_name: state.student.name,
+            student_id: state.student.id,
+            score: state.score,
+            total: quizData.length,
+            quiz_id: "{{ quiz_id }}", // Added quotes to ensure it's a string
+            terminated: wasTerminated
+        };
+
+        try {
+            const response = await fetch("{{url_for('zenith.submit_results')}}", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' ,
+                    "X-CSRFToken": "{{ csrf_token() }}"
+                },
+                body: JSON.stringify(finalData)
+            });
+            if (response.ok) console.log("Results synced.");
+        } catch (error) {
+            console.error("Network error:", error);
+        }
+
+        switchView('view-results');
+        document.getElementById('score-val').innerText = `${state.score} / ${quizData.length}`;
+        const statusEl = document.getElementById('final-status');
+
+        if (wasTerminated) {
+            statusEl.innerText = "Security Violation: Progress reset and submitted.";
+            statusEl.style.color = "var(--error)";
+        } else {
+            statusEl.innerText = `Well done, ${state.student.name}! Your results are recorded.`;
+            statusEl.style.color = "var(--success)";
+        }
+    }</script>
+
+</body>
+
+</html>
