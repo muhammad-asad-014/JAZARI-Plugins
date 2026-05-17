@@ -1,0 +1,25 @@
+{
+  "last_updated": "2026-05-16",
+  "plugins": [
+    {
+      "id": "aero",
+      "name": "AERO",
+      "version": "2.0.1",
+      "folder_name": "AERO_2.0.1",
+      "author": "Asad",
+      "summary": "Automated Enrollment and Record Organizer with Computer Vision.",
+      "icon": "📸",
+      "tags": ["attendance", "ai", "computer-vision"]
+    },
+    {
+      "id": "ikaris",
+      "name": "IKARIS",
+      "version": "1.0.1",
+      "folder_name": "IKARIS_1.0.1",
+      "author": "Asad",
+      "summary": "Intelligent Knowledge Analyzer for Revision & Insightful Summaries.",
+      "icon": "📝",
+      "tags": ["notes", "ai", "markdown"]
+    }
+  ]
+}
