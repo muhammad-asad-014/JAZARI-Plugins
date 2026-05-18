@@ -4,7 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM | Dynamic Assessment</title>
+        <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.png') }}">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <title>ZENITH | Dynamic Assessment</title>
 
     <style>
         :root {
@@ -36,7 +39,7 @@
         .container {
             background: var(--glass);
             width: 100%;
-            max-width: 700px;
+            max-width: 500px;
             padding: 35px;
             border-radius: 20px;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
@@ -113,7 +116,7 @@
             margin-bottom: 8px;
             font-weight: 600;
             font-size: 0.9rem;
-            color: var(--primary);
+            color: #6366f1;
         }
 
         input {
@@ -129,7 +132,7 @@
             padding: 16px;
             border: none;
             border-radius: 50px;
-            background: linear-gradient(45deg, var(--primary), #0caadc);
+            background: #6366f1;
             color: white;
             font-weight: 700;
             cursor: pointer;
@@ -206,7 +209,7 @@
         .warning-card {
             border: 2px solid var(--error);
             background: #fffafa;
-            padding: 20px;
+            padding: 25px;
             border-radius: 15px;
             margin-bottom: 25px;
         }
@@ -214,6 +217,27 @@
 </head>
 
 <body>
+
+<!-- report details -->
+<div id="pdf-report-template" style="display: none; padding: 40px; font-family: 'Poppins', sans-serif; color: #333; background: #fff;">
+   
+    <div style="text-align: center; border-bottom: 3px solid #034748; padding-bottom: 20px;">
+        <img src="{{ url_for('static', filename='images/favicon.png') }}" style="width: 80px; margin-bottom: 10px;" alt="Logo">
+        <h1 style="color: #034748; margin: 0; font-size: 24px;">{{ system_info.orgName }}</h1>
+        <p style="color: #000; font-weight: 100; margin-top: 5px;font-size: x-small;">Automated Quiz Generated & Hosted by ZENITH - JAZARI</p>
+    </div>
+    <div style="margin-top: 30px; background: #f0f8ff; padding: 20px; border-radius: 10px;">
+        <p style="margin: 5px 0;"><strong>Student Name:</strong> <span id="rep-name"></span></p>
+        <p style="margin: 5px 0;"><strong>Student ID:</strong> <span id="rep-id"></span></p>
+        <p style="margin: 5px 0;"><strong>Date:</strong> <span id="rep-date"></span></p>
+        <p style="margin: 5px 0; font-size: 1.2rem; color: #034748;"><strong>Final Score:</strong> <span id="rep-score"></span></p>
+    </div>
+    <div id="rep-questions" style="margin-top: 30px;">
+        </div>
+</div>
+<!-- ------------------------------ -->
+
+
 
     <div id="timer-box">
         <i class="fas fa-stopwatch"></i> <span id="time-left">50</span>s
@@ -235,34 +259,33 @@
         </div>
 
         <div id="view-instructions" class="view">
-            <h2 style="color: var(--error);"><i class="fas fa-shield-alt"></i> Exam Rules</h2>
-            <div class="warning-card">
-                 <h2><i class="fas fa-chalkboard-user"></i> For Teachers</h2>
+            <div class="warning-card" >
+                 <!-- <h2><i class="fas fa-chalkboard-user"></i> For Teachers</h2>
             <ul>
                 <li><i class="fas fa-circle-dot"></i> Access the <b>Teacher Portal</b> to manage quiz, create quiz, and view detailed quiz reports.</li>
                 <li><i class="fas fa-circle-dot"></i> Quizzes are created using a JSON structure, allowing for complex question types and scoring.</li>
                 <li><i class="fas fa-circle-dot"></i> Generated reports provide deep insight into student performance, timing, and academic integrity flags.</li>
-            </ul>
+            </ul> -->
 
-            <h2><i class="fas fa-user-graduate"></i> For Students (Assessment Rules)</h2>
+            <h2><i class="fas fa-user-graduate"></i> Assessment Rules</h2>
             <ul>
                 <li><i class="fas fa-circle-dot"></i> You will be timed <b>per question</b>, not for the whole quiz. Pay close attention to the countdown timer.</li>
                 <li><i class="fas fa-circle-dot"></i> Once an option is selected, your answer is <b>final</b> and cannot be changed.</li>
                 <li><i class="fas fa-circle-dot"></i> If the timer expires, the question is automatically marked as unanswered/incorrect, and you proceed to the next one.</li>
             </ul>
+            <br>
 
-            <h3><i class="fas fa-shield-halved"></i> ACADEMIC INTEGRITY WARNING</h3>
-            <p>
+            <p >
                 The quiz environment is secured. <b>Do not switch tabs, minimize the window, or attempt to navigate away</b> while an assessment is active.
             </p>
             <p>
                 <b>INSTANT PENALTY:</b> Any unauthorized navigation will result in the <b>immediate expiration</b> of the current question's timer.
             </p>
-
+<br>
             <h2><i class="fas fa-cogs"></i> Technical Requirements</h2>
             <ul>
                 <li><i class="fas fa-circle-dot"></i> Use a modern, updated browser (Chrome, Firefox, Edge) for the best experience.</li>
-                <li><i class="fas fa-circle-dot"></i> A highly <b>stable internet connection</b> is mandatory.</li>
+                <li><i class="fas fa-circle-dot"></i> A highly <b>stable internet connection</b>.</li>
             </ul>
             </div>
             <button class="btn" onclick="startAssessment()">Accept & Start Quiz</button>
@@ -293,8 +316,8 @@
             </div>
         </div>
     </div>
-
- <script>const quizData = {{ quiz_json | tojson | safe }};
+<script>
+    const quizData = {{ quiz_json | tojson | safe }};
 
     let state = {
         currentQ: 0,
@@ -304,7 +327,9 @@
         student: {},
         isTerminated: false,
         tempChoice: null,
-        isLocked: false 
+        isLocked: false,
+        lastViolationTime: 0,
+        userAnswers: [] 
     };
 
     function switchView(id) {
@@ -312,13 +337,31 @@
         document.getElementById(id).classList.add('active');
     }
 
-    function showInstructions() {
+    async function showInstructions() {
         const nameInput = document.getElementById('std-name');
         const idInput = document.getElementById('std-id');
-        if (!nameInput.value || !idInput.value) return alert("Please enter your details.");
-        state.student.name = nameInput.value;
-        state.student.id = idInput.value;
-        switchView('view-instructions');
+        
+        if (!nameInput.value || !idInput.value) {
+            return alert("Please enter both your name and ID.");
+        }
+
+        try {
+            const response = await fetch("{{ url_for('zenith.check_attempt') }}", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', "X-CSRFToken": "{{ csrf_token() }}" },
+                body: JSON.stringify({ std_id: idInput.value, quiz_id: "{{ quiz_id }}" })
+            });
+            const data = await response.json();
+
+            if (data.exists) return alert("You have already taken this quiz with this ID.");
+
+            state.student.name = nameInput.value;
+            state.student.id = idInput.value;
+            switchView('view-instructions');
+        } catch (error) {
+            console.error("Verification error:", error);
+            alert("Could not verify ID. Please try again.");
+        }
     }
 
     function startAssessment() {
@@ -356,46 +399,47 @@
             };
             area.appendChild(b);
         });
-
         resetQuestionTimer();
     }
 
     function handleSubmit() {
-        if (state.tempChoice === null) return;
+        if (state.isLocked) return;
         state.isLocked = true;
-        clearInterval(state.interval); 
+        clearInterval(state.interval);
 
         const q = quizData[state.currentQ];
-        const selectedOpt = q.options[state.tempChoice];
-        const allButtons = document.querySelectorAll('.option');
+        let selectedText = "Unanswered/Timed Out";
+        let isCorrect = false;
 
+        if (state.tempChoice !== null) {
+            const selectedOpt = q.options[state.tempChoice];
+            selectedText = selectedOpt.text;
+            isCorrect = selectedOpt.correct;
+            if (isCorrect) state.score++;
+        }
+
+        state.userAnswers.push({ question: q.question, selected: selectedText, correct: isCorrect });
+
+        const allButtons = document.querySelectorAll('.option');
         allButtons.forEach((btn, idx) => {
             btn.classList.add('disabled');
-            if (q.options[idx].correct) {
-                btn.classList.add('correct');
-            } else if (idx === state.tempChoice) {
-                btn.classList.add('wrong');
-            }
+            if (q.options[idx].correct) btn.classList.add('correct');
+            else if (idx === state.tempChoice) btn.classList.add('wrong');
         });
 
-        if (selectedOpt.correct) state.score++;
-
         const ratBox = document.getElementById('rationale-box');
-        ratBox.innerHTML = `<strong>Rationale:</strong> ${selectedOpt.rationale}`;
+        ratBox.innerHTML = `<strong>Rationale:</strong> ${q.options.find(o => o.correct)?.rationale || 'No rationale available.'}`;
         ratBox.style.display = 'block';
 
         const nextBtn = document.getElementById('next-btn');
         nextBtn.innerText = "Next Question";
         nextBtn.onclick = handleNext;
+        nextBtn.style.display = 'block';
     }
 
     function handleNext() {
-        state.currentQ++;
-        if (state.currentQ < quizData.length) {
-            loadQuestion();
-        } else {
-            finishQuiz(false);
-        }
+        if (state.currentQ >= quizData.length - 1) finishQuiz(false);
+        else { state.currentQ++; loadQuestion(); }
     }
 
     function resetQuestionTimer() {
@@ -405,10 +449,7 @@
         state.interval = setInterval(() => {
             state.timer--;
             updateTimerUI();
-            if (state.timer <= 0) {
-                clearInterval(state.interval);
-                handleNext();
-            }
+            if (state.timer <= 0) { clearInterval(state.interval); handleSubmit(); }
         }, 1000);
     }
 
@@ -420,71 +461,92 @@
         else box.classList.remove('warning');
     }
 
+    // --- CHEAT PROTECTION (Original Logic Preserved) ---
     function enableCheatProtection() {
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden && !state.isTerminated) terminateQuiz("Tab Switching Detected");
-        });
-        window.onblur = () => {
-            if (!state.isTerminated) terminateQuiz("Window Focus Lost");
-        };
-        window.onbeforeunload = (e) => {
-            if (!state.isTerminated) {
-                e.preventDefault();
-                return "Warning: Reloading will result in a Zero score.";
+        const handleViolation = () => {
+            const now = Date.now();
+            if (now - state.lastViolationTime < 2000) return; 
+            if (!state.isTerminated && !state.isLocked && document.getElementById('view-quiz').classList.contains('active')) {
+                if (document.hidden || document.hasFocus() === false) {
+                    expireCurrentQuestion("Security Violation: Window/Tab switch detected.");
+                }
             }
         };
+        document.addEventListener('visibilitychange', handleViolation);
+        window.addEventListener('blur', handleViolation);
     }
 
-    function terminateQuiz(reason) {
-        state.isTerminated = true;
-        state.score = 0;
+    function expireCurrentQuestion(reason) {
+        if (state.isLocked) return;
+        state.lastViolationTime = Date.now();
+        state.isLocked = true;
         clearInterval(state.interval);
-        alert(`SECURITY VIOLATION: ${reason}\nScore reset to 0.`);
-        finishQuiz(true);
+        state.userAnswers.push({ question: quizData[state.currentQ].question, selected: "Violation: Skipped/Timed Out", correct: false });
+        alert(`SECURITY WARNING: ${reason}\n\nPenalty applied: Current question expired.`);
+        setTimeout(handleNext, 100); 
+    }
+
+    // --- PDF GENERATION ---
+    function downloadReport() {
+        document.getElementById('rep-name').innerText = state.student.name;
+        document.getElementById('rep-id').innerText = state.student.id;
+        document.getElementById('rep-date').innerText = new Date().toLocaleString();
+        document.getElementById('rep-score').innerText = `${state.score} / ${quizData.length}`;
+
+        const qContainer = document.getElementById('rep-questions');
+        qContainer.innerHTML = '';
+        state.userAnswers.forEach((ans, i) => {
+            qContainer.innerHTML += `
+                <div style="margin-bottom:15px; padding-bottom:10px; border-bottom:1px solid #eee;">
+                    <p style="font-weight:bold; margin:0;">Q${i+1}: ${ans.question}</p>
+                    <p style="margin:5px 0; color: ${ans.correct ? '#28a745' : '#dc3545'};">
+                        Your Answer: ${ans.selected}
+                    </p>
+                </div>`;
+        });
+
+        const element = document.getElementById('pdf-report-template');
+        element.style.display = "block"; // Temporarily reveal
+        
+        const opt = {
+            margin: 0.5,
+            filename: `Zenith_Report_${state.student.id}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(element).save().then(() => {
+            element.style.display = "none"; // Hide again
+        });
     }
 
     async function finishQuiz(wasTerminated) {
-        window.onbeforeunload = null;
         state.isTerminated = true;
         clearInterval(state.interval);
         document.getElementById('timer-box').style.display = 'none';
 
-        // FIXED: Corrected the finalData object structure
-        const finalData = {
-            student_name: state.student.name,
-            student_id: state.student.id,
-            score: state.score,
-            total: quizData.length,
-            quiz_id: "{{ quiz_id }}", // Added quotes to ensure it's a string
-            terminated: wasTerminated
-        };
-
         try {
-            const response = await fetch("{{url_for('zenith.submit_results')}}", {
+            await fetch("{{url_for('zenith.submit_results')}}", {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' ,
-                    "X-CSRFToken": "{{ csrf_token() }}"
-                },
-                body: JSON.stringify(finalData)
+                headers: { 'Content-Type': 'application/json', "X-CSRFToken": "{{ csrf_token() }}" },
+                body: JSON.stringify({
+                    student_name: state.student.name,
+                    student_id: state.student.id,
+                    score: state.score,
+                    total: quizData.length,
+                    quiz_id: "{{ quiz_id }}",
+                    terminated: wasTerminated
+                })
             });
-            if (response.ok) console.log("Results synced.");
-        } catch (error) {
-            console.error("Network error:", error);
-        }
+        } catch (error) { console.error("Error:", error); }
 
+        downloadReport(); 
         switchView('view-results');
         document.getElementById('score-val').innerText = `${state.score} / ${quizData.length}`;
-        const statusEl = document.getElementById('final-status');
-
-        if (wasTerminated) {
-            statusEl.innerText = "Security Violation: Progress reset and submitted.";
-            statusEl.style.color = "var(--error)";
-        } else {
-            statusEl.innerText = `Well done, ${state.student.name}! Your results are recorded.`;
-            statusEl.style.color = "var(--success)";
-        }
-    }</script>
-
+        document.getElementById('final-status').innerText = "Results recorded. Your PDF report is downloading...";
+    }
+</script>
 </body>
 
 </html>

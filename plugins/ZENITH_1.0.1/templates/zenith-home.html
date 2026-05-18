@@ -226,7 +226,7 @@
                     <tr>
                         <th>ID</th>
                         <th>Quiz Name</th> <th>Date</th>
-                        <th class="text-right">Action</th>
+                        <th class="">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -234,7 +234,9 @@
                     <tr>
                         <td class="font-medium">{{rec.id}}</td>
                         <td class="text-muted">{{rec.name}}</td> <td class="text-muted">{{rec.date_created}}</td>
-                        <td class="text-right"><a href="{{url_for('zenith.download_report', report_id=rec.id)}}" class="action-btn edit">Download PDF</a></td>
+                        <td class=""><a href="{{url_for('zenith.download_report', report_id=rec.id)}}" class="action-btn edit">Download PDF</a>
+                        <a href="{{url_for('zenith.delete_report', report_id=rec.id)}}" class="action-btn delete">Delete Quiz</a></td>
+
                     </tr>
                     {% endfor %}
                 </tbody>

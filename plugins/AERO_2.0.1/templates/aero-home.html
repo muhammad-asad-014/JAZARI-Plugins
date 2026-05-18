@@ -1,5 +1,5 @@
 {% extends 'teacher/teacher-base.html' %}
-{% block title %}Attendance{% endblock %}
+{% block title %}Manage Attendance{% endblock %}
 
 <!-- add custom css -->
 {% block addCSS %}
@@ -131,7 +131,7 @@
                         <th>ID</th>
                         <th>Class</th>
                         <th>Date</th>
-                        <th class="text-right">Action</th>
+                        <th class="text-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -141,11 +141,9 @@
                         <td class="font-medium">{{rec.id}}</td>
                         <td class="text-muted">{{rec.class_id.upper()}}</td>
                         <td class="text-muted">{{rec.date_created}}</td>
-                        <td class="text-right" >
-                            <div class="action-group">
-                                <a href="{{url_for('aero.download_report', report_id=rec.id)}}" class="action-btn edit">Download PDF</a>
-                            </div>
-                        </td>
+                        <td class=""><a href="{{url_for('aero.download_report', report_id=rec.id)}}" class="action-btn edit">Download PDF</a>
+                        <a href="{{url_for('aero.delete_report', report_id=rec.id)}}" class="action-btn delete">Delete Record</a></td>
+                        
                     </tr>
                     {% endfor %}
               

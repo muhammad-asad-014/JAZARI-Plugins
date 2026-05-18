@@ -199,6 +199,7 @@ def update_settings():
 
 
 
+
 def generate_quiz(app, id, data, name, teacher, classID, pdf_path, topics, count, difficulty, status):
     with app.app_context():
         from core.models import Quiz
@@ -384,16 +385,35 @@ def end_quiz():
         print(f"Error: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
+
+@bp.route('/check-attempt', methods=['POST'])
+def check_attempt():
+    data = request.get_json()
+    roll_id = data.get('std_id')
+    quiz_id = data.get('quiz_id')
+    
+    try:
+        table_name = f'temp_{quiz_id}'
+        query = text(f"SELECT 1 FROM {table_name} WHERE student_id = :roll_id")
+        result = db.session.execute(query, {"roll_id": roll_id}).fetchone()
+        
+        exists = result is not None
+        return jsonify({"exists": exists}), 200
+    except Exception as e:
+        return jsonify({"exists": False}), 200
+
+
 @bp.route('/attempt-quiz/<quiz_id>')
 def attempt_quiz(quiz_id):
     quiz_id = f"{quiz_id}"
-    from core.models import Quiz
+    from core.models import Quiz, Settings
+    system_info = Settings.query.get('001')
     quiz_data = Quiz.query.filter_by(id=quiz_id).first()
     print(quiz_data)
     if quiz_data.status=='active':
         from utils.utilities import shuffler
         quiz_json = shuffler(quiz_data.embedding)
-        return render_template('zenith-quiz.html', quiz_json = quiz_json, quiz_id = quiz_id)
+        return render_template('zenith-quiz.html', quiz_json = quiz_json, quiz_id = quiz_id, system_info = system_info)
     else:
         return render_template('zenith-error.html', quiz_id = quiz_id)
 
@@ -426,3 +446,36 @@ def submit_results():
     except Exception as e:
         return jsonify({"status": "fail", "message": "Result not recorded"}), 400
 
+
+
+@bp.route('/delete/<report_id>/')
+@teacher_only
+def delete_report(report_id):
+    from core.models import Quiz
+    report = Quiz.query.filter_by(id=report_id).first()
+
+    if not report:
+        flash("Error: Report no longer exists.", "error")
+        return redirect(url_for('zenith.home'))
+
+    try:
+        filename = f"{report_id}.pdf"
+        file_path = os.path.join(records_folder, filename)
+        
+        if os.path.exists(file_path):
+            os.remove(file_path)
+            print(f"File {filename} deleted from storage.")
+        else:
+            print(f"Note: File {filename} was already missing from storage.")
+
+        db.session.delete(report)
+        db.session.commit()
+
+        flash(f"Report {report_id} has been permanently deleted.", "success")
+
+    except Exception as e:
+        db.session.rollback() 
+        print(f"Delete Error: {e}")
+        flash(f"An error occurred while deleting: {str(e)}", "error")
+
+    return redirect(url_for('zenith.home'))

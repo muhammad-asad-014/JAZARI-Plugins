@@ -213,14 +213,14 @@
 {% block managePluginsActive %}active{% endblock %}
 
 <!-- add section title -->
-{% block sectionTitle %}IKARIS Settings{% endblock %}
+{% block sectionTitle %}PRESENTA Settings{% endblock %}
 
 <!-- add section code -->
 
 {% block section %}
 <div class="settings-grid">
     
-   <form action="{{url_for('ikaris.update_settings')}}" method="POST" class="settings-card glass" enctype="multipart/form-data" novalidate>
+   <form action="{{url_for('presenta.settings')}}" method="POST" class="settings-card glass" enctype="multipart/form-data" novalidate>
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <div class="card-header"><h3>General Settings</h3></div>
 

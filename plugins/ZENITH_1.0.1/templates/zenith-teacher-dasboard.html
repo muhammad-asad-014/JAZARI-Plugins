@@ -116,6 +116,7 @@
 
 
 
+
 <!-- add section title -->
 {% block sectionTitle %}Teacher Dashboard{% endblock %}
 
@@ -153,11 +154,11 @@
                     <span class="info-val" style="display:block; font-weight:700;">{{ data.class_id.upper() }}</span>
                     <span class="info-lbl" style="font-size:0.75rem; color:var(--text-muted);">Class ID</span>
                 </div>
-                <div class="info-item">
+                <!-- <div class="info-item">
                     <i class="fas fa-question-circle"></i>
-                    <span class="info-val" style="display:block; font-weight:700;">10</span>
+                    <span class="info-val" style="display:block; font-weight:700;">{{ data.total_mcqs }}</span>
                     <span class="info-lbl" style="font-size:0.75rem; color:var(--text-muted);">Total MCQs</span>
-                </div>
+                </div> -->
                 <div class="info-item">
                     <i class="fas fa-user-tie"></i>
                     <span class="info-val" style="display:block; font-weight:700;">{{ data.teacher.upper() }}</span>
@@ -196,14 +197,14 @@
                         <th width="60">SR.</th>
                         <th>STUDENT ID</th>
                         <th>STUDENT NAME</th>
-                        <th class="text-right">MARKS (out of 10)</th>
+                        <th class="text-right">MARKS Obtained</th>
                     </tr>
                 </thead>
                 <tbody id="studentResultsBody">
                     {% if result %}
                     {%for res in result%}
                     <tr>
-                        <td></td>
+                       <td>{{ loop.index }}</td>
                         <td>{{res.student_id}}</td>
                         <td>{{res.student_name}}</td>
                         <td>{{res.obtained_marks}}</td>

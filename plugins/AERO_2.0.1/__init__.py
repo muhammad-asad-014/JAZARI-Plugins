@@ -293,3 +293,37 @@ def decode_base64_image(image_data):
     opencv_img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
     return opencv_img
+
+
+
+@bp.route('/delete/<report_id>/')
+@teacher_only
+def delete_report(report_id):
+    from core.models import Attendance
+    report = Attendance.query.filter_by(id=report_id).first()
+
+    if not report:
+        flash("Error: Report no longer exists.", "error")
+        return redirect(url_for('aero.home'))
+
+    try:
+        filename = f"{report_id}.pdf"
+        file_path = os.path.join(attendance_folder, filename)
+        
+        if os.path.exists(file_path):
+            os.remove(file_path)
+            print(f"File {filename} deleted from storage.")
+        else:
+            print(f"Note: File {filename} was already missing from storage.")
+
+        db.session.delete(report)
+        db.session.commit()
+
+        flash(f"Report {report_id} has been permanently deleted.", "success")
+
+    except Exception as e:
+        db.session.rollback() 
+        print(f"Delete Error: {e}")
+        flash(f"An error occurred while deleting: {str(e)}", "error")
+
+    return redirect(url_for('aero.home'))
