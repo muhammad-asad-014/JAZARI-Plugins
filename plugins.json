@@ -8,7 +8,15 @@
       "folder_name": "AERO_2.0.1",
       "author": "Tetramen",
       "summary": "Automated Enrollment and Record Organizer with Computer Vision.",
-      "icon": "📸",
+      "tags": ["attendance", "ai", "computer-vision"]
+    },
+    {
+      "id": "aero",
+      "name": "AERO",
+      "version": "1.0.1",
+      "folder_name": "AERO_1.0.1",
+      "author": "Tetramen",
+      "summary": "Automated Enrollment and Record Organizer with Computer Vision.",
       "tags": ["attendance", "ai", "computer-vision"]
     },
     {
@@ -18,7 +26,6 @@
       "folder_name": "IKARIS_1.0.1",
       "author": "Tetramen",
       "summary": "Intelligent Knowledge Analyzer for Revision & Insightful Summaries.",
-      "icon": "📝",
       "tags": ["notes", "ai", "markdown"]
     },
     {
@@ -28,7 +35,6 @@
       "folder_name": "ZENITH_1.0.1",
       "author": "Tetramen",
       "summary": "Zone of Educational Navigation for Intelligent Testing and Hosting",
-      "icon": "📝",
       "tags": ["quiz", "ai", "automated quiz"]
     },
     {
@@ -38,7 +44,6 @@
       "folder_name": "ROBERTA_1.0.1",
       "author": "Tetramen",
       "summary": "Real time Observation of Behavior, Engagement and Reporting Teaching Analytics",
-      "icon": "📝",
       "tags": ["attention", "behavior", "monitoring"]
     },
     {
@@ -48,17 +53,15 @@
       "folder_name": "JAZ_1.0.1",
       "author": "Tetramen",
       "summary": "Just in time Assistance Zone.",
-      "icon": "📝",
       "tags": ["ai", "assistant", "RAG"]
     },
     {
       "id": "presenta",
       "name": "PRESENTA",
       "version": "1.0.1",
-      "folder_name": "PRESNTA_1.0.1",
+      "folder_name": "PRESENTA_1.0.1",
       "author": "Tetramen",
       "summary": "Presentation Rendering Engine.",
-      "icon": "📝",
       "tags": ["presentation", "slides", "ppt"]
     }
   ]
